@@ -1,6 +1,8 @@
 package com.example.avoidingrain.controller;
 
 import com.example.avoidingrain.entity.TestCase;
+import com.example.avoidingrain.entity.TestCaseDp;
+import com.example.avoidingrain.enums.ExcelExportDPEnum;
 import com.example.avoidingrain.enums.ExcelExportEnum;
 import com.example.avoidingrain.utils.ExcelUtils;
 import com.example.avoidingrain.utils.TestCaseGenerator;
@@ -31,6 +33,29 @@ public class ExportExcelController {
     private static final String EXCEL_HEAD_FILE_NAME_FORMAT = "ISO8859-1";
     private static final String GB2312                      = "gb2312";
 
+    @RequestMapping("/exportExcelDP")
+    public void exportExcelDP(HttpServletResponse response) throws IOException {
+        List<String> headRowNames = Lists.newArrayList();
+        headRowNames.add(ExcelExportDPEnum.ITEMS.getName());
+        headRowNames.add(ExcelExportDPEnum.N.getName());
+        headRowNames.add(ExcelExportDPEnum.W.getName());
+        headRowNames.add(ExcelExportDPEnum.RES.getName());
+        headRowNames.add(ExcelExportDPEnum.RUN_TIME.getName());
+        List<Map<String, String>> listData = Lists.newArrayList();
+        List<TestCaseDp> caseList = testCaseGenerator.generateDPCaseList(500);
+        for (TestCaseDp testCase : caseList) {
+            Map<String, String> mapItem = new HashMap<>();
+            mapItem.put(ExcelExportDPEnum.ITEMS.getName(), testCase.getItems());
+            mapItem.put(ExcelExportDPEnum.N.getName(), testCase.getN());
+            mapItem.put(ExcelExportDPEnum.W.getName(), testCase.getW());
+            mapItem.put(ExcelExportDPEnum.RES.getName(), testCase.getRes());
+            mapItem.put(ExcelExportDPEnum.RUN_TIME.getName(), testCase.getRunTime());
+            listData.add(mapItem);
+        }
+        byte[] excelData = ExcelUtils.getExcelDataDefault("sheet", headRowNames, listData);
+        exportExcel(excelData, response, "20221122凑单测试case.xlsx");
+    }
+
     /**
      * n个人k个亭子，时间复杂度：(k+1)**n
      * http://localhost:8080/exportExcel?n=10&k=10
@@ -53,7 +78,7 @@ public class ExportExcelController {
         List<TestCase> caseList = new ArrayList<>();
         for (int i = 1; i < n; i++) {
             for (int j = 1; j < k; j++) {
-                System.out.println(String.format("i:%s,j:%s",i,j));
+                System.out.println(String.format("i:%s,j:%s", i, j));
                 caseList.add(testCaseGenerator.generateCase(i, j, 5));
             }
         }

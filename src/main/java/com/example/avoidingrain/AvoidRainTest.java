@@ -1,5 +1,6 @@
 package com.example.avoidingrain;
 
+import com.example.avoidingrain.entity.PathTrack;
 import com.example.avoidingrain.utils.JsonUtils;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ public class AvoidRainTest {
         // 表示大家独立处在的位置
         int[] homie = new int[]{0, 7, 8, 10, 13, 15, 17};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -23,6 +25,7 @@ public class AvoidRainTest {
         int[][] shelter = new int[][]{{5, 1}, {12, 1}};
         int[] homie = new int[]{1, 7, 13};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -30,6 +33,7 @@ public class AvoidRainTest {
         int[][] shelter = new int[][]{{5, 2}, {13, 3}};
         int[] homie = new int[]{1, 7, 8, 10, 15};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -37,6 +41,7 @@ public class AvoidRainTest {
         int[][] shelter = new int[][]{{1, 0}, {13, 1}};
         int[] homie = new int[]{2};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -44,6 +49,7 @@ public class AvoidRainTest {
         int[][] shelter = new int[][]{{1, 1}, {13, 1}};
         int[] homie = new int[]{2};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -51,6 +57,7 @@ public class AvoidRainTest {
         int[][] shelter = new int[][]{{1, 0}, {13, 0}};
         int[] homie = new int[]{2};
         testProcedure(shelter, homie);
+        testProcedure1(shelter, homie);
     }
 
     @Test
@@ -82,6 +89,22 @@ public class AvoidRainTest {
         testProcedure(shelter, homie);
     }
 
+    @Test
+    public void test9() {
+        int[][] shelter = new int[][]{{2, 1}, {9, 2}, {19, 1}, {31, 2}, {23, 2}, {36, 2}, {59, 2}, {68, 1}, {65, 1}};
+        int[] homie = new int[]{0, 5, 10, 20, 26, 37, 56, 42, 80};
+        testProcedure1(shelter, homie);
+        testProcedure(shelter, homie);
+    }
+
+    @Test
+    public void test10() {
+        int[][] shelter = new int[][]{{1, 2}, {7, 1}, {10, 1}, {32, 2}, {33, 2}, {52, 2}, {52, 1}, {68, 1}};
+        int[] homie = new int[]{3, 10, 23, 34, 39, 25, 40, 59, 60};
+        testProcedure1(shelter, homie);
+        testProcedure(shelter, homie);
+    }
+
     /**
      * 区间 [min,max]
      *
@@ -103,5 +126,26 @@ public class AvoidRainTest {
                 JsonUtils.toJson(avoidRain.getMinTrack()), avoidRain.getMinDist()));
         long endTime = System.currentTimeMillis();
         System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
+    }
+
+    private void testProcedure1(int[][] shelter, int[] homie) {
+        long startTime = System.currentTimeMillis();
+        AvoidRain avoidRain = new AvoidRain();
+        int[][] enhanceShelter = avoidRain.enhance(shelter);
+        // 记录「路径」
+        avoidRain.backTrack(enhanceShelter, homie, 0, new PathTrack(new LinkedList<>(),
+                getAvailableShelter(shelter), 0, false));
+        System.out.println(String.format("===最优避雨方案：%s，路径长度：%s===",
+                JsonUtils.toJson(avoidRain.getMinTrack()), avoidRain.getMinDist()));
+        long endTime = System.currentTimeMillis();
+        System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
+    }
+
+    private int getAvailableShelter(int[][] shelter) {
+        int res = 0;
+        for (int i = 0; i < shelter.length; i++) {
+            res += shelter[i][1];
+        }
+        return res;
     }
 }
